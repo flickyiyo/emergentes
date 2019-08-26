@@ -57,14 +57,15 @@ func (*server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppiSe
 	fmt.Println("Sent From Rasppi invoked")
 	for {
 		imgStream, err := stream.Recv()
-		if err != io.EOF {
-			log.Fatalf("Stream finished %v\n", err)
+		if err == io.EOF {
+			log.Printf("Stream finished %v\n", err)
 			return err
 		}
 		if err != nil {
-			log.Fatalf("Error receiving from Rasp %v\n", err)
+			// log.Fatalf("Error receiving from Rasp %v\n", err)
 			return err
 		}
+		log.Println(imgStream.GetImage())
 		for key := range connections {
 			connections[key].Callback(imgStream.GetImage())
 		}

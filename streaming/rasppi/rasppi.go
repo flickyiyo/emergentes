@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/flickyiyo/emergentes/imgstream"
 
@@ -28,12 +29,20 @@ func main() {
 		log.Fatalf("Error invoking simple call %v", err)
 	}
 	fmt.Println(res.GetW())
+	sendImagesToServer(client)
 }
 
 func sendImagesToServer(client imgstream.ImgStreamServiceClient) {
-	res, err := client.SentFromRasppi(context.Background())
+	fmt.Println("Doing client to server")
+	stream, err := client.SentFromRasppi(context.Background())
 	if err != nil {
 		log.Fatalf("Error while sending images %v\n", err)
 	}
 	// msg, err := res.Recv()
+	for {
+		stream.Send(&imgstream.ImageStream{
+			Image: []byte{byte(12)},
+		})
+		time.Sleep(time.Second * 2)
+	}
 }

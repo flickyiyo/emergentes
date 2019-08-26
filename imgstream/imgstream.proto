@@ -3,6 +3,7 @@ syntax = "proto3";
 package imgstream;
 
 option go_package="imgstream";
+option java_package = "com.imgstream";
 
 message ImageRequest {
     int32 w = 1;
