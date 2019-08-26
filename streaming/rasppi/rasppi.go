@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/flickyiyo/emergentes/imgstream"
@@ -29,10 +31,28 @@ func main() {
 		log.Fatalf("Error invoking simple call %v", err)
 	}
 	fmt.Println(res.GetW())
-	sendImagesToServer(client)
+	readFile(client)
 }
 
-func sendImagesToServer(client imgstream.ImgStreamServiceClient) {
+func readFile(client imgstream.ImgStreamServiceClient) {
+	fileName := "./gopher.jpg"
+	file, err := os.Open(fileName)
+	if err != nil {
+		log.Fatalf("Error on open file %v\n", err)
+		return
+	}
+	defer file.Close()
+	fileInfo, _ := file.Stat()
+	var size int64 = fileInfo.Size()
+	bytes := make([]byte, size)
+
+	buffer := bufio.NewReader(file)
+	_, err = buffer.Read(bytes)
+	// fileType := http.DetectContentType(bytes)
+	sendImagesToServer(client, bytes)
+}
+
+func sendImagesToServer(client imgstream.ImgStreamServiceClient, buffer []byte) {
 	fmt.Println("Doing client to server")
 	stream, err := client.SentFromRasppi(context.Background())
 	if err != nil {
@@ -41,7 +61,7 @@ func sendImagesToServer(client imgstream.ImgStreamServiceClient) {
 	// msg, err := res.Recv()
 	for {
 		stream.Send(&imgstream.ImageStream{
-			Image: []byte{byte(12)},
+			Image: buffer,
 		})
 		time.Sleep(time.Second * 2)
 	}
