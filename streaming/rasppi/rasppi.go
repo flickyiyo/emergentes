@@ -44,6 +44,7 @@ func readFile() ([]byte, int64) {
 	defer file.Close()
 	fileInfo, _ := file.Stat()
 	size := fileInfo.Size()
+	fmt.Println(size)
 	bytes := make([]byte, size)
 
 	buffer := bufio.NewReader(file)
@@ -70,7 +71,7 @@ func sendImagesToServer(client imgstream.ImgStreamServiceClient, buffer []byte) 
 
 func takePicture(client imgstream.ImgStreamServiceClient) {
 	for {
-		f, err := os.Create("./current.jpg")
+		f, err := os.Create("current.jpg")
 		if err != nil {
 			log.Fatalf("Error taking picture %v\n", err)
 		}

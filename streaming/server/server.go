@@ -73,9 +73,8 @@ func (*server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppiSe
 		if err != nil {
 			log.Fatalf("Error while creating new image %v\n", err)
 		}
-		_, err = f.Write(imgStream.GetImage())
-		for key := range connections {
-			connections[key].Callback(imgStream.GetImage())
+		if imgStream.GetImage() != nil {
+			_, err = f.Write(imgStream.GetImage())
 		}
 	}
 }
