@@ -69,7 +69,7 @@ func sendImagesToServer(client imgstream.ImgStreamServiceClient, buffer []byte) 
 }
 
 func takePicture(client imgstream.ImgStreamServiceClient) {
-	f, err := os.Create("current.jpg")
+	f, err := os.Create("./current.jpg")
 	if err != nil {
 		log.Fatalf("Error taking picture %v\n", err)
 	}

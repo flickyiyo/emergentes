@@ -58,6 +58,7 @@ func (*server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppiSe
 	fmt.Println("Sent From Rasppi invoked")
 	for {
 		imgStream, err := stream.Recv()
+		fmt.Println(imgStream)
 		if err == io.EOF {
 			log.Printf("Stream finished %v\n", err)
 			return err
@@ -68,6 +69,7 @@ func (*server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppiSe
 		}
 		log.Println(imgStream.GetImage())
 		f, err := os.Create("img.jpg")
+
 		if err != nil {
 			log.Fatalf("Error while creating new image %v\n", err)
 		}
