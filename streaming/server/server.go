@@ -81,8 +81,18 @@ func (s *server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppi
 		if imgStream.GetImage() != nil {
 			// _, err = f.Write(imgStream.GetImage())
 			s.Bytes = imgStream.GetImage()
+			createFile(s.Bytes)
 		}
 	}
+}
+
+func createFile(buffer []byte) {
+	element, err := os.Create("img.jpg")
+	if err != nil {
+		log.Fatalf("Error creating serve file %v\n", err)
+	}
+	defer element.Close()
+	element.Write(buffer)
 }
 func (*server) AskFromMobile(stream imgstream.ImgStreamService_AskFromMobileServer) error {
 	return nil
@@ -114,15 +124,8 @@ func main() {
 	srv := &server{}
 	imgstream.RegisterImgStreamServiceServer(s, srv)
 	go func() {
-		http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
-			element, err := os.Create("img.jpg")
-			if err != nil {
-				log.Fatalf("Error creating serve file %v\n", err)
-			}
-			defer element.Close()
-			element.Write(srv.Bytes)
-			http.ServeFile(res, req, "./img.jpg")
-		})
+		fs := http.FileServer(http.Dir("static"))
+		http.Handle("/", fs)
 		http.ListenAndServe(":8080", nil)
 	}()
 	if err := s.Serve(lis); err != nil {
