@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/dhowden/raspicam"
 	"github.com/flickyiyo/emergentes/imgstream"
 
 	"google.golang.org/grpc"
@@ -31,25 +32,25 @@ func main() {
 		log.Fatalf("Error invoking simple call %v", err)
 	}
 	fmt.Println(res.GetW())
-	readFile(client)
+	takePicture(client)
 }
 
-func readFile(client imgstream.ImgStreamServiceClient) {
-	fileName := "./gopher.jpg"
+func readFile() ([]byte, int64) {
+	fileName := "./current.jpg"
 	file, err := os.Open(fileName)
 	if err != nil {
 		log.Fatalf("Error on open file %v\n", err)
-		return
 	}
 	defer file.Close()
 	fileInfo, _ := file.Stat()
-	var size int64 = fileInfo.Size()
+	size := fileInfo.Size()
 	bytes := make([]byte, size)
 
 	buffer := bufio.NewReader(file)
 	_, err = buffer.Read(bytes)
+	return bytes, size
 	// fileType := http.DetectContentType(bytes)
-	sendImagesToServer(client, bytes)
+
 }
 
 func sendImagesToServer(client imgstream.ImgStreamServiceClient, buffer []byte) {
@@ -65,4 +66,22 @@ func sendImagesToServer(client imgstream.ImgStreamServiceClient, buffer []byte) 
 		})
 		time.Sleep(time.Second * 2)
 	}
+}
+
+func takePicture(client imgstream.ImgStreamServiceClient) {
+	f, err := os.Create("current.jpg")
+	if err != nil {
+		log.Fatalf("Error taking picture %v\n", err)
+	}
+	s := raspicam.NewStill()
+	errCh := make(chan error)
+	go func() {
+		for x := range errCh {
+			fmt.Fprintf(os.Stderr, "%v\n", x)
+		}
+	}()
+	log.Println("Capturing image...")
+	raspicam.Capture(s, f, errCh)
+	bytes, _ := readFile()
+	sendImagesToServer(client, bytes)
 }

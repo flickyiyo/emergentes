@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"os"
 	"time"
 
 	"github.com/flickyiyo/emergentes/imgstream"
@@ -66,6 +67,11 @@ func (*server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppiSe
 			return err
 		}
 		log.Println(imgStream.GetImage())
+		f, err := os.Create("img.jpg")
+		if err != nil {
+			log.Fatalf("Error while creating new image %v\n", err)
+		}
+		_, err = f.Write(imgStream.GetImage())
 		for key := range connections {
 			connections[key].Callback(imgStream.GetImage())
 		}
