@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"net"
+	"net/http"
+	"os"
 	"time"
 
 	"github.com/flickyiyo/emergentes/imgstream"
@@ -73,7 +75,6 @@ func (s *server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppi
 		}
 		// log.Println(imgStream.GetImage())
 		// f, err := os.Create("img.jpg")
-
 		if err != nil {
 			log.Fatalf("Error while creating new image %v\n", err)
 		}
@@ -110,8 +111,20 @@ func main() {
 		log.Fatalf("Error on creating listener %v", err)
 	}
 	s := grpc.NewServer()
-	imgstream.RegisterImgStreamServiceServer(s, &server{})
-
+	srv := &server{}
+	imgstream.RegisterImgStreamServiceServer(s, srv)
+	go func() {
+		http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
+			element, err := os.Create("img.jpg")
+			if err != nil {
+				log.Fatalf("Error creating serve file %v\n", err)
+			}
+			defer element.Close()
+			element.Write(srv.Bytes)
+			http.ServeFile(res, req, "./img.jpg")
+		})
+		http.ListenAndServe(":8080", nil)
+	}()
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve %v", err)
 	}
