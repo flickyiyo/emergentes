@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	conn, err := grpc.Dial("35.203.126.106:50051", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("Could not connect %v", err)
 	}
