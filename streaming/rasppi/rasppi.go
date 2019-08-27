@@ -54,7 +54,7 @@ func readFile() ([]byte, int64) {
 
 }
 
-func sendImagesToServer(client imgstream.ImgStreamServiceClient, buffer []byte) {
+func sendImagesToServer(client imgstream.ImgStreamServiceClient) {
 	fmt.Println("Doing client to server")
 	stream, err := client.SentFromRasppi(context.Background())
 	if err != nil {
@@ -62,6 +62,7 @@ func sendImagesToServer(client imgstream.ImgStreamServiceClient, buffer []byte) 
 	}
 	// msg, err := res.Recv()
 	for {
+		bytes, _ := readFile()
 		stream.Send(&imgstream.ImageStream{
 			Image: buffer,
 		})
@@ -84,7 +85,7 @@ func takePicture(client imgstream.ImgStreamServiceClient) {
 		log.Println("Capturing image...")
 		raspicam.Capture(s, f, errCh)
 		bytes, _ := readFile()
-		sendImagesToServer(client, bytes)
+		sendImagesToServer(client)
 		f.Close()
 	}
 }
