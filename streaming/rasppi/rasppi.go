@@ -32,7 +32,7 @@ func main() {
 		log.Fatalf("Error invoking simple call %v", err)
 	}
 	fmt.Println(res.GetW())
-	takePicture(client)
+	sendImagesToServer(client)
 }
 
 func readFile() ([]byte, int64) {
@@ -62,30 +62,26 @@ func sendImagesToServer(client imgstream.ImgStreamServiceClient) {
 	}
 	// msg, err := res.Recv()
 	for {
+		takePicture()
 		bytes, _ := readFile()
 		stream.Send(&imgstream.ImageStream{
-			Image: buffer,
+			Image: bytes,
 		})
 		time.Sleep(time.Second * 2)
 	}
 }
 
-func takePicture(client imgstream.ImgStreamServiceClient) {
-	for {
-		f, err := os.Create("current.jpg")
-		if err != nil {
-			log.Fatalf("Error taking picture %v\n", err)
-			break
-		}
-		s := raspicam.NewStill()
-		s.BaseStill.Height = 500
-		s.BaseStill.Width = 500
-		s.BaseStill.Timeout = time.Millisecond * 1000
-		errCh := make(chan error)
-		log.Println("Capturing image...")
-		raspicam.Capture(s, f, errCh)
-		bytes, _ := readFile()
-		sendImagesToServer(client)
-		f.Close()
+func takePicture() {
+	f, err := os.Create("current.jpg")
+	if err != nil {
+		log.Fatalf("Error taking picture %v\n", err)
 	}
+	s := raspicam.NewStill()
+	s.BaseStill.Height = 500
+	s.BaseStill.Width = 500
+	s.BaseStill.Timeout = time.Millisecond * 1000
+	errCh := make(chan error)
+	log.Println("Capturing image...")
+	raspicam.Capture(s, f, errCh)
+	f.Close()
 }
