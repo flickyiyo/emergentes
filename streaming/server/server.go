@@ -67,7 +67,7 @@ func (*server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppiSe
 			// log.Fatalf("Error receiving from Rasp %v\n", err)
 			return err
 		}
-		log.Println(imgStream.GetImage())
+		// log.Println(imgStream.GetImage())
 		f, err := os.Create("img.jpg")
 
 		if err != nil {

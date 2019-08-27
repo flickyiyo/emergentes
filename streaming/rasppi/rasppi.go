@@ -83,7 +83,6 @@ func takePicture(client imgstream.ImgStreamServiceClient) {
 		log.Println("Capturing image...")
 		raspicam.Capture(s, f, errCh)
 		bytes, _ := readFile()
-		fmt.Println(bytes)
 		sendImagesToServer(client, bytes)
 	}
 }
