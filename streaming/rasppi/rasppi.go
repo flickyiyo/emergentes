@@ -74,15 +74,17 @@ func takePicture(client imgstream.ImgStreamServiceClient) {
 		f, err := os.Create("current.jpg")
 		if err != nil {
 			log.Fatalf("Error taking picture %v\n", err)
+			break
 		}
 		s := raspicam.NewStill()
 		s.BaseStill.Height = 500
 		s.BaseStill.Width = 500
-		s.BaseStill.Timeout = time.Millisecond * 200
+		s.BaseStill.Timeout = time.Millisecond * 1000
 		errCh := make(chan error)
 		log.Println("Capturing image...")
 		raspicam.Capture(s, f, errCh)
 		bytes, _ := readFile()
 		sendImagesToServer(client, bytes)
+		f.Close()
 	}
 }
