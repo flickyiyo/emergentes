@@ -71,6 +71,7 @@ func sendImagesToServer(client imgstream.ImgStreamServiceClient, buffer []byte) 
 
 func takePicture(client imgstream.ImgStreamServiceClient) {
 	for {
+
 		f, err := os.Create("current.jpg")
 		if err != nil {
 			log.Fatalf("Error taking picture %v\n", err)
@@ -78,15 +79,9 @@ func takePicture(client imgstream.ImgStreamServiceClient) {
 		s := raspicam.NewStill()
 		s.BaseStill.Timeout = time.Millisecond * 200
 		errCh := make(chan error)
-		go func() {
-			for x := range errCh {
-				fmt.Fprintf(os.Stderr, "%v\n", x)
-			}
-		}()
 		log.Println("Capturing image...")
 		raspicam.Capture(s, f, errCh)
 		bytes, _ := readFile()
 		sendImagesToServer(client, bytes)
 	}
-
 }
