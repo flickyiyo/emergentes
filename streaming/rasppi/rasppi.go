@@ -32,9 +32,7 @@ func main() {
 		log.Fatalf("Error invoking simple call %v", err)
 	}
 	fmt.Println(res.GetW())
-	bytes, _ := readFile()
-	fmt.Println(bytes)
-	sendImagesToServer(client, bytes)
+	takePicture(client)
 }
 
 func readFile() ([]byte, int64) {
