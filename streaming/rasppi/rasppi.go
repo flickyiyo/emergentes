@@ -77,7 +77,6 @@ func takePicture(client imgstream.ImgStreamServiceClient) {
 			log.Fatalf("Error taking picture %v\n", err)
 		}
 		s := raspicam.NewStill()
-		s.BaseStill.Timelapse = time.Millisecond * 100
 		s.BaseStill.Timeout = time.Millisecond * 200
 		errCh := make(chan error)
 		go func() {
