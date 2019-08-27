@@ -67,7 +67,6 @@ func sendImagesToServer(client imgstream.ImgStreamServiceClient) {
 		stream.Send(&imgstream.ImageStream{
 			Image: bytes,
 		})
-		time.Sleep(time.Second * 2)
 	}
 }
 
@@ -79,7 +78,7 @@ func takePicture() {
 	s := raspicam.NewStill()
 	s.BaseStill.Height = 500
 	s.BaseStill.Width = 500
-	s.BaseStill.Timeout = time.Millisecond * 200
+	s.BaseStill.Timeout = time.Millisecond * 50
 	errCh := make(chan error)
 	log.Println("Capturing image...")
 	raspicam.Capture(s, f, errCh)

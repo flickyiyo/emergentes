@@ -7,7 +7,6 @@ import (
 	"log"
 	"net"
 	"os"
-	"time"
 
 	"github.com/flickyiyo/emergentes/imgstream"
 	"google.golang.org/grpc"
@@ -33,25 +32,7 @@ type clientCamera struct {
 var connections map[string]*clientCamera
 
 func (*server) AskToRasppi(req *imgstream.ImageRequest, stream imgstream.ImgStreamService_AskToRasppiServer) error {
-	var username string = req.GetUsername()
-	cc := &clientCamera{
-		Callback: func(imgBytes []byte) error {
-			err := stream.Send(&imgstream.ImageStream{
-				Image: imgBytes,
-			})
-			if err != nil {
-				log.Fatalf("Error streaming to end client %v\n", err)
-				return err
-			}
-			return nil
-		},
-		Status: connected,
-	}
-	connections[username] = cc
-	for connections[username].Status == connected {
-		time.Sleep(time.Second * 2)
-	}
-	delete(connections, username)
+
 	return nil
 }
 func (*server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppiServer) error {
