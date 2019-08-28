@@ -107,12 +107,16 @@ func (s *server) AskFromMobile(stream imgstream.ImgStreamService_AskFromMobileSe
 	// }
 	go func() {
 		for {
-			fmt.Println("iterating")
+			_, err := stream.Recv()
+			if err != nil {
+				waitChan <- "Close"
+				return
+			}
 			if s.Bytes == nil {
 				waitChan <- "Close"
 				break
 			}
-			err := stream.Send(&imgstream.ImageStream{
+			err = stream.Send(&imgstream.ImageStream{
 				Image: s.Bytes,
 			})
 			if err == io.EOF {
