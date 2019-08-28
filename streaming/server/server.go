@@ -81,7 +81,6 @@ func (s *server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppi
 		if imgStream.GetImage() != nil {
 			// _, err = f.Write(imgStream.GetImage())
 			s.Bytes = imgStream.GetImage()
-			createFile(s.Bytes)
 			time.Sleep(time.Second * 1)
 		}
 	}
