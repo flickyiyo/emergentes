@@ -121,7 +121,8 @@ func (s *server) AskFromMobile(stream imgstream.ImgStreamService_AskFromMobileSe
 			}
 			if err != nil {
 				waitChan <- "Close"
-				log.Fatalf("Error sending image to client %v\n", err)
+				return
+				// log.Fatalf("Error sending image to client %v\n", err)
 			}
 			time.Sleep(time.Millisecond * 100)
 		}
