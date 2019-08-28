@@ -83,6 +83,7 @@ func (s *server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppi
 		createFile(s.Bytes)
 		time.Sleep(time.Second * 1)
 	}
+	return nil
 }
 
 func createFile(buffer []byte) {
