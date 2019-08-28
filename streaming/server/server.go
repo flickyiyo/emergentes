@@ -58,7 +58,7 @@ func (s *server) AskToRasppi(req *imgstream.ImageRequest, stream imgstream.ImgSt
 				return
 				// log.Fatalf("Error sending image to client %v\n", err)
 			}
-			time.Sleep(time.Millisecond * 100)
+			time.Sleep(time.Millisecond * 500)
 		}
 	}()
 	fmt.Println(<-waitChan)
