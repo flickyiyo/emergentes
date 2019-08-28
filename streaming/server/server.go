@@ -64,8 +64,8 @@ func (s *server) AskToRasppi(req *imgstream.ImageRequest, stream imgstream.ImgSt
 	return nil
 }
 func (s *server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppiServer) error {
+	fmt.Println("Sent From Rasppi invoked")
 	for {
-		fmt.Println("Sent From Rasppi invoked")
 		imgStream, err := stream.Recv()
 		if err == io.EOF {
 			log.Printf("Stream finished %v\n", err)
