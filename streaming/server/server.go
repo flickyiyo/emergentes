@@ -62,7 +62,7 @@ func (s *server) AskToRasppi(req *imgstream.ImageRequest, stream imgstream.ImgSt
 	return nil
 }
 func (s *server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppiServer) error {
-	for {}
+	for {
 		fmt.Println("Sent From Rasppi invoked")
 		imgStream, err := stream.Recv()
 		if err == io.EOF {
@@ -129,7 +129,7 @@ func main() {
 		// fs := http.FileServer(http.Dir("static"))
 		// http.Handle("/", fs)
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			
+
 			w.Write(srv.Bytes)
 
 		})
