@@ -81,7 +81,7 @@ func (s *server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppi
 		if imgStream.GetImage() != nil {
 			// _, err = f.Write(imgStream.GetImage())
 			s.Bytes = imgStream.GetImage()
-			time.Sleep(time.Second * 1)
+			createFile(imgStream.GetImage())
 		}
 	}
 }
@@ -125,13 +125,9 @@ func main() {
 	srv := &server{}
 	imgstream.RegisterImgStreamServiceServer(s, srv)
 	go func() {
-		// fs := http.FileServer(http.Dir("static"))
-		// http.Handle("/", fs)
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fs := http.FileServer(http.Dir("static"))
+		http.Handle("/", fs)
 
-			w.Write(srv.Bytes)
-
-		})
 		http.ListenAndServe(":8080", nil)
 	}()
 	if err := s.Serve(lis); err != nil {
