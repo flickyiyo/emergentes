@@ -97,7 +97,35 @@ func createFile(buffer []byte) {
 	element.Write(buffer)
 	element.Close()
 }
-func (*server) AskFromMobile(stream imgstream.ImgStreamService_AskFromMobileServer) error {
+func (s *server) AskFromMobile(stream imgstream.ImgStreamService_AskFromMobileServer) error {
+	fmt.Println("Mobile phone asking")
+	waitChan := make(chan string)
+	err := stream.Recv()
+	if err == io.EOF || err != nil {
+		log.Fatalf("Receivied emty or end of ")
+	}
+	go func() {
+		for {
+			fmt.Println("iterating")
+			if s.Bytes == nil {
+				waitChan <- "Close"
+				break
+			}
+			err := stream.Send(&imgstream.ImageStream{
+				Image: s.Bytes,
+			})
+			if err == io.EOF {
+				waitChan <- "Close"
+				return
+			}
+			if err != nil {
+				waitChan <- "Close"
+				log.Fatalf("Error sending image to client %v\n", err)
+			}
+			time.Sleep(time.Millisecond * 100)
+		}
+	}()
+	<-waitChan
 	return nil
 }
 
