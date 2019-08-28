@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -22,16 +23,34 @@ func main() {
 	client := imgstream.NewImgStreamServiceClient(conn)
 	buffer := readFile()
 	stream, err := client.SentFromRasppi(context.Background())
-	for {
-		err = stream.Send(&imgstream.ImageStream{
-			Image: buffer,
-		})
-		if err != nil {
-			log.Fatalf("Error sendin image %v\n", err)
+	go func() {
+		for {
+			err = stream.Send(&imgstream.ImageStream{
+				Image: buffer,
+			})
+			if err != nil {
+				log.Fatalf("Error sendin image %v\n", err)
+			}
+			time.Sleep(time.Millisecond * 100)
 		}
-		time.Sleep(time.Millisecond * 100)
-	}
+	}()
+	waitc := make(chan string)
+	stream2, err := client.AskFromMobile(context.Background())
+	go func() {
+		for {
+			msg, err := stream2.Recv()
+			if err == io.EOF {
+				waitc <- "EOF"
+			}
+			if err != nil {
+				waitc <- "Error"
+			}
+			fmt.Println(len(msg.GetImage()))
+			time.Sleep(time.Second * 1)
+		}
 
+	}()
+	fmt.Println(<-waitc)
 }
 
 func readFile() []byte {
