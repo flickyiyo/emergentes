@@ -100,10 +100,10 @@ func createFile(buffer []byte) {
 func (s *server) AskFromMobile(stream imgstream.ImgStreamService_AskFromMobileServer) error {
 	fmt.Println("Mobile phone asking")
 	waitChan := make(chan string)
-	_, err := stream.Recv()
-	if err == io.EOF || err != nil {
-		log.Fatalf("Receivied emty or end of ")
-	}
+	// _, err := stream.Recv()
+	// if err == io.EOF || err != nil {
+	// 	log.Fatalf("Receivied emty or end of ")
+	// }
 	go func() {
 		for {
 			fmt.Println("iterating")
