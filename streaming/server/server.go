@@ -62,28 +62,29 @@ func (s *server) AskToRasppi(req *imgstream.ImageRequest, stream imgstream.ImgSt
 	return nil
 }
 func (s *server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppiServer) error {
-	fmt.Println("Sent From Rasppi invoked")
-	imgStream, err := stream.Recv()
-	if err == io.EOF {
-		log.Printf("Stream finished %v\n", err)
-		return err
+	for {}
+		fmt.Println("Sent From Rasppi invoked")
+		imgStream, err := stream.Recv()
+		if err == io.EOF {
+			log.Printf("Stream finished %v\n", err)
+			return err
+		}
+		if err != nil {
+			// log.Fatalf("Error receiving from Rasp %v\n", err)
+			return err
+		}
+		// log.Println(imgStream.GetImage())
+		// f, err := os.Create("img.jpg")
+		if err != nil {
+			log.Fatalf("Error while creating new image %v\n", err)
+		}
+		if imgStream.GetImage() != nil {
+			// _, err = f.Write(imgStream.GetImage())
+			s.Bytes = imgStream.GetImage()
+			createFile(s.Bytes)
+			time.Sleep(time.Second * 1)
+		}
 	}
-	if err != nil {
-		// log.Fatalf("Error receiving from Rasp %v\n", err)
-		return err
-	}
-	// log.Println(imgStream.GetImage())
-	// f, err := os.Create("img.jpg")
-	if err != nil {
-		log.Fatalf("Error while creating new image %v\n", err)
-	}
-	if imgStream.GetImage() != nil {
-		// _, err = f.Write(imgStream.GetImage())
-		s.Bytes = imgStream.GetImage()
-		createFile(s.Bytes)
-		time.Sleep(time.Second * 1)
-	}
-	return nil
 }
 
 func createFile(buffer []byte) {
@@ -128,10 +129,8 @@ func main() {
 		// fs := http.FileServer(http.Dir("static"))
 		// http.Handle("/", fs)
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			file, _ := os.Create("static/img.png")
-			file.Write(srv.Bytes)
-			http.ServeFile(w, r, "static/img.png")
-			file.Close()
+			
+			w.Write(srv.Bytes)
 
 		})
 		http.ListenAndServe(":8080", nil)
