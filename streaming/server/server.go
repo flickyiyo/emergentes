@@ -128,7 +128,11 @@ func main() {
 		// fs := http.FileServer(http.Dir("static"))
 		// http.Handle("/", fs)
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			file, _ := os.Create("static/img.png")
+			file.Write(srv.Bytes)
 			http.ServeFile(w, r, "static/img.png")
+			file.Close()
+
 		})
 		http.ListenAndServe(":8080", nil)
 	}()
