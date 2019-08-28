@@ -86,7 +86,7 @@ func (s *server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppi
 }
 
 func createFile(buffer []byte) {
-	element, err := os.Create("static/img.jpg")
+	element, err := os.Create("static/img.png")
 	if err != nil {
 		log.Fatalf("Error creating serve file %v\n", err)
 	}
