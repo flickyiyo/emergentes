@@ -62,37 +62,37 @@ func (s *server) AskToRasppi(req *imgstream.ImageRequest, stream imgstream.ImgSt
 	return nil
 }
 func (s *server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppiServer) error {
-	for {
-		fmt.Println("Sent From Rasppi invoked")
-		imgStream, err := stream.Recv()
-		if err == io.EOF {
-			log.Printf("Stream finished %v\n", err)
-			return err
-		}
-		if err != nil {
-			// log.Fatalf("Error receiving from Rasp %v\n", err)
-			return err
-		}
-		// log.Println(imgStream.GetImage())
-		// f, err := os.Create("img.jpg")
-		if err != nil {
-			log.Fatalf("Error while creating new image %v\n", err)
-		}
-		if imgStream.GetImage() != nil {
-			// _, err = f.Write(imgStream.GetImage())
-			s.Bytes = imgStream.GetImage()
-			createFile(s.Bytes)
-		}
+	fmt.Println("Sent From Rasppi invoked")
+	imgStream, err := stream.Recv()
+	if err == io.EOF {
+		log.Printf("Stream finished %v\n", err)
+		return err
+	}
+	if err != nil {
+		// log.Fatalf("Error receiving from Rasp %v\n", err)
+		return err
+	}
+	// log.Println(imgStream.GetImage())
+	// f, err := os.Create("img.jpg")
+	if err != nil {
+		log.Fatalf("Error while creating new image %v\n", err)
+	}
+	if imgStream.GetImage() != nil {
+		// _, err = f.Write(imgStream.GetImage())
+		s.Bytes = imgStream.GetImage()
+		createFile(s.Bytes)
+		time.Sleep(time.Second * 1)
 	}
 }
 
 func createFile(buffer []byte) {
-	element, err := os.Create("img.jpg")
+	element, err := os.Create("static/img.jpg")
 	if err != nil {
 		log.Fatalf("Error creating serve file %v\n", err)
 	}
 	defer element.Close()
 	element.Write(buffer)
+	element.Close()
 }
 func (*server) AskFromMobile(stream imgstream.ImgStreamService_AskFromMobileServer) error {
 	return nil
@@ -124,8 +124,11 @@ func main() {
 	srv := &server{}
 	imgstream.RegisterImgStreamServiceServer(s, srv)
 	go func() {
-		fs := http.FileServer(http.Dir("static"))
-		http.Handle("/", fs)
+		// fs := http.FileServer(http.Dir("static"))
+		// http.Handle("/", fs)
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, "static/img.png")
+		})
 		http.ListenAndServe(":8080", nil)
 	}()
 	if err := s.Serve(lis); err != nil {
