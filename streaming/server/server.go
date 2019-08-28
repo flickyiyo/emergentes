@@ -61,7 +61,7 @@ func (s *server) AskToRasppi(req *imgstream.ImageRequest, stream imgstream.ImgSt
 			time.Sleep(time.Millisecond * 100)
 		}
 	}()
-	<-waitChan
+	fmt.Println(<-waitChan)
 	return nil
 }
 func (s *server) SentFromRasppi(stream imgstream.ImgStreamService_SentFromRasppiServer) error {
