@@ -37,12 +37,14 @@ type clientCamera struct {
 var connections map[string]*clientCamera
 
 func (s *server) AskToRasppi(req *imgstream.ImageRequest, stream imgstream.ImgStreamService_AskToRasppiServer) error {
+	fmt.Println("Receiving ask to rasppi")
 	waitChan := make(chan string)
 	go func() {
 		for {
+			fmt.Println("iterating")
 			if s.Bytes == nil {
 				waitChan <- "Close"
-				continue
+				break
 			}
 			err := stream.Send(&imgstream.ImageStream{
 				Image: s.Bytes,
